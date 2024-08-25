@@ -1,5 +1,5 @@
 use tokio::{
-    io::{self, AsyncReadExt, AsyncWriteExt},
+    io::{self},
     net::TcpListener,
 };
 
@@ -11,20 +11,9 @@ async fn main() -> io::Result<()> {
         let (mut stream, _) = listener.accept().await?;
 
         tokio::spawn(async move {
-            let mut buf = vec![0; 1024];
-            loop {
-                match stream.read(&mut buf).await {
-                    Ok(0) => return,
-                    Ok(n) => {
-                        if stream.write_all(&buf[..n]).await.is_err() {
-                            return;
-                        };
-                        stream.write_all(b"\n").await.unwrap();
-                    }
-                    Err(_) => {
-                        return;
-                    }
-                };
+            let (mut rd, mut wr) = stream.split();
+            if io::copy(&mut rd, &mut wr).await.is_err() {
+                eprintln!("Error Echoing");
             }
         });
     }

@@ -13,7 +13,7 @@ async fn main() -> io::Result<()> {
         let reader = io::BufReader::new(stdin);
         let mut lines = reader.lines();
         while let Some(line) = lines.next_line().await.unwrap() {
-            wr.write_all(line.as_bytes()).await.unwrap();
+            wr.write_all(format!("{line}\n").as_bytes()).await.unwrap();
         }
     });
 
@@ -21,10 +21,7 @@ async fn main() -> io::Result<()> {
     let mut lines = reader.lines();
 
     while let Some(line) = lines.next_line().await.unwrap() {
-        io::stdout()
-            .write_all(format!("\t{line}\n").as_bytes())
-            .await?;
-        io::stdout().flush().await?;
+        println!("\t{}", line.to_uppercase());
     }
 
     Ok(())
