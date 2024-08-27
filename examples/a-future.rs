@@ -1,5 +1,6 @@
 use std::{
     future::Future,
+    io,
     pin::Pin,
     sync::{mpsc, Arc, Mutex},
     task::{Context, Poll, Waker},
@@ -7,7 +8,11 @@ use std::{
     time::{Duration, Instant},
 };
 
-use futures::task::{waker, ArcWake};
+use futures::{
+    channel::oneshot,
+    task::{waker, ArcWake},
+};
+use tokio::net::TcpListener;
 
 struct MiniTokio {
     scheduled: mpsc::Receiver<Arc<Task>>,
